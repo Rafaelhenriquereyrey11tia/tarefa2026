@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Catálogo — Produtos Cadastrados</title>
+    <link rel="stylesheet" href="lista.css" />
+</head>
+
+<body>
+    <div class="page">
+        <header class="topbar">
+            <a href="../index.html" class="back-link">← Início</a>
+            <span class="topbar-title">Produtos Cadastrados</span>
+            <a href="../cadastro/index.html" class="btn-novo">+ Novo</a>
+        </header>
+
+        <main class="container">
+            <div class="list-header">
+                <h1>Todos os Itens</h1>
+                <p id="contador">Carregando...</p>
+            </div>
+
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <span>Buscando itens...</span>
+            </div>
+
+            <div id="erro" class="erro hidden"></div>
+
+            <div id="lista" class="lista hidden"></div>
+
+            <div id="vazio" class="vazio hidden">
+                <span class="vazio-icon">📭</span>
+                <p>Nenhum item cadastrado ainda.</p>
+                <a href="../cadastro/index.html" class="btn-novo-vazio">Cadastrar primeiro item</a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000'
+
+        const tipoEmoji = {
+            'Produto': '📦',
+            'Filme': '🎬',
+            'Música': '🎵',
+            'Outro': '🗂️',
+        }
+
+        async function carregarProdutos() {
+            const loading = document.getElementById('loading')
+            const lista = document.getElementById('lista')
+            const vazio = document.getElementById('vazio')
+            const erroEl = document.getElementById('erro')
+            const contador = document.getElementById('contador')
+
+            try {
+                const res = await fetch(`${API_URL}/produtos`)
+                if (!res.ok) throw new Error('Erro ao buscar produtos.')
+                const produtos = await res.json()
+
+                loading.classList.add('hidden')
+
+                if (produtos.length === 0) {
+                    vazio.classList.remove('hidden')
+                    contador.textContent = '0 itens encontrados'
+                    return
+                }
+
+                contador.textContent = `${produtos.length} ${produtos.length === 1 ? 'item encontrado' : 'itens encontrados'}`
+
+                lista.innerHTML = produtos.map(p => `
+          <div class="card">
+            <div class="card-top">
+              <span class="card-icon">${tipoEmoji[p.tipo] || '🗂️'}</span>
+              <span class="card-badge">${p.tipo}</span>
+            </div>
+            <h2 class="card-nome">${p.nome}</h2>
+            ${p.descricao ? `<p class="card-desc">${p.descricao}</p>` : ''}
+            <span class="card-id">#${p.id}</span>
+          </div>
+        `).join('')
+
+                lista.classList.remove('hidden')
+            } catch (err) {
+                loading.classList.add('hidden')
+                erroEl.textContent = `❌ ${err.message}`
+                erroEl.classList.remove('hidden')
+                contador.textContent = 'Erro ao carregar'
+            }
+        }
+
+        carregarProdutos()
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,15 @@
+{
+    "name": "api-tarefa-2026",
+    "version": "1.0.0",
+    "description": "API de cadastro de produtos",
+    "main": "server.js",
+    "type": "module",
+    "scripts": {
+        "dev": "node --watch server.js",
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "express": "^5.2.1"
+    }
+}

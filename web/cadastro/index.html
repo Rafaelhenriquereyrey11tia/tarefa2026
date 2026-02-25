@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Catálogo — Cadastrar Item</title>
+    <link rel="stylesheet" href="cadastro.css" />
+</head>
+
+<body>
+    <div class="page">
+        <header class="topbar">
+            <a href="../index.html" class="back-link">← Início</a>
+            <span class="topbar-title">Cadastrar Item</span>
+        </header>
+
+        <main class="container">
+            <div class="form-card">
+                <div class="form-header">
+                    <span class="form-icon">➕</span>
+                    <h1>Novo Item</h1>
+                    <p>Preencha os campos abaixo para adicionar um produto, filme ou música.</p>
+                </div>
+
+                <form id="form-cadastro">
+                    <div class="field">
+                        <label for="nome">Nome <span class="required">*</span></label>
+                        <input type="text" id="nome" name="nome" placeholder="Ex: Inception" required />
+                    </div>
+
+                    <div class="field">
+                        <label for="tipo">Tipo <span class="required">*</span></label>
+                        <select id="tipo" name="tipo" required>
+                            <option value="" disabled selected>Selecione um tipo</option>
+                            <option value="Produto">📦 Produto</option>
+                            <option value="Filme">🎬 Filme</option>
+                            <option value="Música">🎵 Música</option>
+                            <option value="Outro">🗂️ Outro</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="descricao">Descrição</label>
+                        <textarea id="descricao" name="descricao" rows="4"
+                            placeholder="Descreva brevemente o item..."></textarea>
+                    </div>
+
+                    <div id="msg" class="msg" role="alert"></div>
+
+                    <button type="submit" class="btn-submit">
+                        <span id="btn-text">Cadastrar</span>
+                    </button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000'
+
+        document.getElementById('form-cadastro').addEventListener('submit', async (e) => {
+            e.preventDefault()
+
+            const nome = document.getElementById('nome').value.trim()
+            const tipo = document.getElementById('tipo').value
+            const descricao = document.getElementById('descricao').value.trim()
+            const msg = document.getElementById('msg')
+            const btnText = document.getElementById('btn-text')
+
+            msg.textContent = ''
+            msg.className = 'msg'
+            btnText.textContent = 'Enviando...'
+
+            try {
+                const response = await fetch(`${API_URL}/produtos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, tipo, descricao }),
+                })
+
+                const data = await response.json()
+
+                if (!response.ok) {
+                    throw new Error(data.erro || 'Erro ao cadastrar.')
+                }
+
+                msg.textContent = '✅ Item cadastrado com sucesso! Redirecionando...'
+                msg.classList.add('msg--success')
+
+                setTimeout(() => {
+                    window.location.href = '../lista/index.html'
+                }, 1500)
+            } catch (err) {
+                msg.textContent = `❌ ${err.message}`
+                msg.classList.add('msg--error')
+                btnText.textContent = 'Cadastrar'
+            }
+        })
+    </script>
+</body>
+
+</html>
